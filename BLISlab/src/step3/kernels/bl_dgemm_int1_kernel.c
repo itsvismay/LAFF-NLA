@@ -2,18 +2,18 @@
 #include "bl_dgemm_kernel.h"
 
 //micro-panel a is stored in column major, lda=DGEMM_MR.
-//#define a(i,j) a[ (j)*DGEMM_MR + (i) ]
+#define a(i,j) a[ (j)*DGEMM_MR + (i) ]
 //micro-panel b is stored in row major, ldb=DGEMM_NR.
-//#define b(i,j) b[ (i)*DGEMM_NR + (j) ]
+#define b(i,j) b[ (i)*DGEMM_NR + (j) ]
 //result      c is stored in column major.
-//#define c(i,j) c[ (j)*ldc + (i) ]
+#define c(i,j) c[ (j)*ldc + (i) ]
 
 //micro-panel a is stored in column major, lda=DGEMM_MR.
-#define a(i,j) (a + (j)*DGEMM_MR + (i) )
+//#define a(i,j) (a + (j)*DGEMM_MR + (i) )
 //micro-panel b is stored in row major, ldb=DGEMM_NR.
-#define b(i,j) (b + (i)*DGEMM_NR + (j) )
+//#define b(i,j) (b + (i)*DGEMM_NR + (j) )
 //result      c is stored in column major.
-#define c(i,j) (c + (j)*ldc + (i) )
+//#define c(i,j) (c + (j)*ldc + (i) )
 
 void bl_dgemm_ukr( int    k,
                    double *a,
@@ -24,18 +24,18 @@ void bl_dgemm_ukr( int    k,
 {
     dim_t l, j, i;
 
-    for ( l = 0; l < k / DGEMM_NR; ++l )
+    for ( l = 0; l < DGEMM_NR/k; ++l )
     {
         for ( i = 0; i < DGEMM_NR; ++i )
         {
             for ( j = 0; j < DGEMM_MR; ++j )
             {
 
-                bl_daxpy_asm_4x1( b + l * DGEMM_NR * DGEMM_NR + i * DGEMM_NR + j,
-                                  a + l * DGEMM_NR * DGEMM_NR + i * DGEMM_NR,
-                                  c + DGEMM_NR * i);
+                //bl_daxpy_asm_4x1( b + l * DGEMM_NR * DGEMM_NR + i * DGEMM_NR + j,
+                  //                a + l * DGEMM_NR * DGEMM_NR + i * DGEMM_NR,
+                    //              c + DGEMM_NR * i);
 
-                //c( i, j ) += a( i, l ) * b( l, j );
+                c( i, j ) += a( i, l ) * b( l, j );
 
             }
         }
